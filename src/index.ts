@@ -1,13 +1,15 @@
 import { config, styleContent } from "./config";
 
 export default class Slog {
-  // [x: string]: any;
+
+  // 配置
   public config: any = {};
-  public style: any = {};
-  public selfconsole: any;
+  // console-log-star
+  public selfconsole: any = {};
+  // 原生console
   public original_console = typeof console !== "undefined" ? console : {};
+
   constructor(c: config) {
-    // super();
     Object.assign(
       this.config,
       {
@@ -19,13 +21,14 @@ export default class Slog {
       },
       c
     );
-    this.style = styleContent;
     this.observe();
-    this.installWriteLog();
+    this.setupWriteLog();
+    this.consoleStyle()
+    this.setupCsslog()
   }
 
   observe() {
-    let _this = this;
+    // let _this = this;
     if (this.config.environment !== "development") {
       let _c: any = {};
       Object.keys(console).forEach((item: string) => {
@@ -36,24 +39,13 @@ export default class Slog {
     }
     this.selfconsole = new Proxy(console, {
       get(obj, prop, value) {
-        // obj.log("console--log--get", obj, prop, value);
-        // let event = new CustomEvent(prop, {
-        //   detail: value,
-        // });
-        // _this.dispatchEvent(event);
-        // if (_this.config.environment){
-        //   return;
-        // }
-        // obj.log(...arguments);
-        // var args = Array.prototype.slice.apply(arguments);
-        // obj.log(args);
         return Reflect.get(obj, prop, value);
       },
     });
 
   }
 
-  installWriteLog() {
+  setupWriteLog() {
     this.selfconsole.wlog = (...param: any) => {
       // todo write  log
       if (typeof this.config.consoleWriteLogFun === "function"){
@@ -64,17 +56,24 @@ export default class Slog {
     };
   }
 
-  // log(...params: any) {
-  //   if (typeof console !== "object") return;
-  //   let func: string = "log";
-  //   let paramsFrist: string = params[0];
-  //   if (Object.keys(console).includes(paramsFrist)) {
-  //     func = paramsFrist;
-  //     params.shift();
-  //   }
-  //   if (this.config.environment !== "development") return;
-  //   //   if (!wx.env.isDebug) return;
-  //   // eval(`console.${func}`).apply(console, [...params]);
-  //   (<any>console)[func].apply(console, [...params]);
-  // }
+  consoleStyle(){
+    this.selfconsole.style = styleContent;
+  }
+
+  setupCsslog(){
+    this.selfconsole.csslog  = ( text: string, ...styleArr:any) => {
+      const styleArrKeys: Array<string> = Object.keys(styleContent)
+      const styleData: any = []
+      styleArr.forEach((element: Number| String) => {
+        if(typeof element === "number"){
+          let index = styleArrKeys[element]? styleArrKeys[element] : "red";
+          styleData.push(this.selfconsole.style[index])
+        }else{
+          styleData.push(element)
+        }
+      });
+      this.selfconsole.log(text, ...styleData)
+    }
+
+  }
 }
