@@ -15,7 +15,7 @@
     "@babel/core": "^7.13.16",
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^3.0.0",
-    "console-log-star": "^1.1.0",
+    "console-log-star": "^1.2.0",
     "console-proxy": "^0.2.6",
     "html-webpack-plugin": "^4.5.0",
     "webpack": "4.33.0",
