@@ -40,10 +40,11 @@ console.csslog("%chello%cworld", 0, 2);
 console.csslog("%chello%cworld", 0, 0);
 console.csslog("%chello%cworld", 5, 6);
 console.csslog("%chello world", 1);
+console.csslog("%chello %cworld", 5, "background:red;color:#FFF");
 
 
 //创建一个组
-console.group("%c组内容输出", console.style.red);
+console.group("%c组内容输出", console.style.key);
 //分组输出
 console.log("我是组里面的内容1");
 console.log("我是组里面的内容2");
