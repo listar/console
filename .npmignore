@@ -2,6 +2,7 @@
 node_modules/
 examples/dist/
 examples/node_modules/
+examples/package-lock.json
 src/
 .babelrc
 .gitignore
