@@ -1,12 +1,17 @@
-const path = require('path');
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const htmlWebpackPlugin = new HtmlWebpackPlugin({
     template: path.join(__dirname, "./src/index.html"),
     filename: "./index.html"
 });
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-module.exports = {
+export default {
     mode: 'development',
     entry: path.join(__dirname, "./src/index.js"),
     output: {

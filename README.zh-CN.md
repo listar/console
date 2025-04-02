@@ -94,6 +94,95 @@ console.log("%c这是一个值", console.style.value);
 console.csslog("自定义样式", "color: green; font-size: 20px;");
 ```
 
+### 样式详解
+
+Console-Log-Star提供了两种使用样式的方式：索引样式和命名样式。
+
+#### 索引样式 (0-6)
+
+可以通过数字索引快速使用7种预设样式：
+
+```typescript
+// 红色粗体
+console.csslog("样式0", 0);  // color: red; font-weight: bold;
+
+// 蓝色粗体
+console.csslog("样式1", 1);  // color: blue; font-weight: bold;
+
+// 绿色粗体
+console.csslog("样式2", 2);  // color: green; font-weight: bold;
+
+// 橙色粗体
+console.csslog("样式3", 3);  // color: orange; font-weight: bold;
+
+// 紫色粗体
+console.csslog("样式4", 4);  // color: purple; font-weight: bold;
+
+// 蓝绿色粗体
+console.csslog("样式5", 5);  // color: teal; font-weight: bold;
+
+// 棕色粗体
+console.csslog("样式6", 6);  // color: brown; font-weight: bold;
+```
+
+#### 命名样式
+
+内置的命名样式可以通过`console.style`对象访问：
+
+```typescript
+// 紫色粗体，大号字体
+console.log("%c标题样式", console.style.purple);  // color: purple; font-weight: bold; font-size: 16px;
+
+// 蓝色粗体
+console.log("%c键样式", console.style.key);  // color: blue; font-weight: bold;
+
+// 绿色普通
+console.log("%c值样式", console.style.value);  // color: green; font-weight: normal;
+
+// 带背景和边框的标记样式
+console.log("%c标记样式", console.style.markedness);  // 带特殊标记的样式
+
+// 红色错误样式
+console.log("%c错误提示", console.style.error);  // 错误提示样式
+
+// 写日志样式
+console.log("%c日志记录", console.style.writeLog);  // 日志记录样式
+
+// 大盒子样式
+console.log("%c大盒子样式", console.style.bigBox);  // 带边框的大盒子样式
+```
+
+#### 自定义样式
+
+您可以使用任何有效的CSS样式创建自定义样式：
+
+```typescript
+// 直接使用自定义样式
+console.csslog("红色背景样式", "color: white; background: red; padding: 2px 5px; border-radius: 3px;");
+
+// 将自定义样式添加到style对象
+console.style.success = "color: green; font-weight: bold; background: #e8f5e9; padding: 2px 5px; border-radius: 3px;";
+console.style.warning = "color: orange; font-weight: bold; background: #fff3e0; padding: 2px 5px; border-radius: 3px;";
+console.style.failure = "color: red; font-weight: bold; background: #ffebee; padding: 2px 5px; border-radius: 3px;";
+
+// 使用自定义样式
+console.log("%c成功", console.style.success);
+console.log("%c警告", console.style.warning);
+console.log("%c失败", console.style.failure);
+```
+
+样式支持所有CSS属性，如：
+- `color`: 文本颜色
+- `background`: 背景颜色
+- `font-size`: 字体大小
+- `font-weight`: 字体粗细
+- `padding`: 内边距
+- `margin`: 外边距
+- `border`: 边框
+- `border-radius`: 圆角
+- `text-decoration`: 文本装饰
+- `text-shadow`: 文本阴影
+
 ### 日志记录
 
 ```typescript
@@ -252,28 +341,115 @@ console.error('错误');
 import Slog from 'console-log-star';
 
 const logger = new Slog();
-
-// 全局替换原生console
-// 注意：在某些环境中直接修改全局console可能会受到限制
-window.console = logger.selfconsole;
-// 或在Node.js环境中
 global.console = logger.selfconsole;
+
+// 现在所有console调用都使用增强版本
+console.log('这是增强版的console');
 ```
 
-## 可用样式
+## 最佳实践
 
-- `markedness` - 蓝色背景，白色文字
-- `error` - 红色背景，白色文字
-- `writeLog` - 带蓝色下划线
-- `purple` - 紫色背景，白色文字
-- `bigBox` - 带红色边框的大盒子
-- `key` - 红色背景标签
-- `value` - 绿色背景标签
+### 按模块使用前缀
 
-## 贡献
+在大型应用中，推荐为每个模块创建带前缀的日志记录器：
 
-欢迎提交 issues 和 pull requests 来帮助改进这个项目。
+```typescript
+// user-service.ts
+import { console } from './logger';
 
-## 许可
+const userLogger = console.withPrefix('[用户服务]');
 
-ISC
+export class UserService {
+  getUsers() {
+    userLogger.log('正在获取用户列表...');
+    // ...
+  }
+}
+
+// auth-service.ts
+import { console } from './logger';
+
+const authLogger = console.withPrefix('[认证服务]');
+
+export class AuthService {
+  login(username, password) {
+    authLogger.log(`用户 ${username} 尝试登录`);
+    // ...
+  }
+}
+```
+
+### 使用标签进行日志分类
+
+使用标签可以使日志更易于搜索和过滤：
+
+```typescript
+function processOrder(order) {
+  console.taggedLog(['订单', '处理'], `开始处理订单 ${order.id}`);
+  
+  try {
+    // 处理订单...
+    console.taggedLog(['订单', '成功'], `订单 ${order.id} 处理成功`);
+  } catch (error) {
+    console.taggedLog(['订单', '错误'], `订单 ${order.id} 处理失败`, error);
+  }
+}
+```
+
+### 日志级别最佳实践
+
+- **DEBUG**：详细的开发信息，辅助调试
+- **INFO**：常规操作信息，应用正常工作的状态
+- **WARN**：可能的问题或即将发生的问题
+- **ERROR**：错误和异常情况
+- **NONE**：禁用所有日志
+
+## 高级功能
+
+### 自定义样式模板
+
+```typescript
+import Slog from 'console-log-star';
+
+const logger = new Slog();
+const console = logger.selfconsole;
+
+// 添加自定义样式
+console.style.success = "color: green; font-weight: bold; background: #e8f5e9; padding: 2px 5px; border-radius: 3px;";
+console.style.failure = "color: red; font-weight: bold; background: #ffebee; padding: 2px 5px; border-radius: 3px;";
+
+// 使用自定义样式
+console.log("%c操作成功", console.style.success);
+console.log("%c操作失败", console.style.failure);
+```
+
+### 性能测试
+
+```typescript
+import Slog from 'console-log-star';
+
+const logger = new Slog();
+const console = logger.selfconsole;
+
+// 测量代码执行时间
+console.time('操作耗时');
+
+// 执行一些耗时操作
+for (let i = 0; i < 1000000; i++) {
+  // ...
+}
+
+// 输出执行时间
+console.timeEnd('操作耗时'); // 输出：操作耗时: 123ms
+```
+
+## 版本历史
+
+- **v1.3.0**：添加日志级别、历史、标签、前缀、条件和限流功能
+- **v1.2.8**：增加更多样式选项和格式化功能
+- **v1.2.0**：添加环境控制功能
+- **v1.0.0**：首次发布，提供基本的样式化控制台和日志记录
+
+## 许可证
+
+ISC 

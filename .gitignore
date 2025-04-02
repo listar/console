@@ -16,3 +16,4 @@
 node_modules
 example/node_modules
 examples/package-lock.json
+package-lock.json
