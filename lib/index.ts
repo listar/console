@@ -148,7 +148,7 @@ export class SlogConsole {
           prefix
         };
         this.addToHistory(entry);
-        originalMethod(`[${prefix}] ${message}`, ...args);
+        console[method](`[${prefix}] ${message}`, ...args);
       };
     });
 
